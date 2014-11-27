@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License
  */
-package net.codestory.http.appengine;
+package com.google.apphosting.vmruntime;
 
 import com.google.apphosting.api.ApiProxy;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
-class LazyApiProxyEnvironment implements ApiProxy.Environment {
-    private final Supplier<ApiProxy.Environment> supplier;
+public class LazyApiProxyEnvironment implements ApiProxy.Environment {
+    private final Supplier<VmApiProxyEnvironment> supplier;
 
-    private ApiProxy.Environment delegate;
+    private VmApiProxyEnvironment delegate;
 
-    LazyApiProxyEnvironment(Supplier<ApiProxy.Environment> supplier) {
+    public LazyApiProxyEnvironment(Supplier<VmApiProxyEnvironment> supplier) {
         this.supplier = supplier;
     }
 
-    private ApiProxy.Environment delegate() {
+    private VmApiProxyEnvironment delegate() {
         if (delegate == null) {
             delegate = supplier.get();
         }
@@ -85,5 +85,34 @@ class LazyApiProxyEnvironment implements ApiProxy.Environment {
     @Override
     public long getRemainingMillis() {
         return delegate().getRemainingMillis();
+    }
+
+    public void aSyncApiCallAdded(long maxWaitMs) throws ApiProxy.ApiProxyException {
+        delegate().aSyncApiCallAdded(maxWaitMs);
+    }
+
+    public void apiCallStarted(long maxWaitMs, boolean releasePendingCall) throws ApiProxy.ApiProxyException {
+        delegate().apiCallStarted(maxWaitMs, releasePendingCall);
+
+    }
+
+    public void apiCallCompleted() {
+        delegate().apiCallCompleted();
+    }
+
+    public void addLogRecord(ApiProxy.LogRecord record) {
+        delegate().addLogRecord(record);
+    }
+
+    public void flushLogs() {
+        delegate().flushLogs();
+    }
+
+    public String getServer() {
+        return delegate().getServer();
+    }
+
+    public String getTicket() {
+        return delegate().getTicket();
     }
 }

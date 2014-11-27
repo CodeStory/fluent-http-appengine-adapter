@@ -407,7 +407,7 @@ public class VmApiProxyEnvironment implements ApiProxy.Environment {
      *
      * @throws ApiProxyException
      */
-    void aSyncApiCallAdded(long maxWaitMs) throws ApiProxyException {
+    public void aSyncApiCallAdded(long maxWaitMs) throws ApiProxyException {
         try {
             if (pendingApiCallSemaphore.tryAcquire(maxWaitMs, TimeUnit.MILLISECONDS)) {
                 return;
@@ -426,7 +426,7 @@ public class VmApiProxyEnvironment implements ApiProxy.Environment {
      *                           API call was requested asynchronously).
      * @throws ApiProxyException If the thread was interrupted while waiting for a semaphore.
      */
-    void apiCallStarted(long maxWaitMs, boolean releasePendingCall) throws ApiProxyException {
+    public void apiCallStarted(long maxWaitMs, boolean releasePendingCall) throws ApiProxyException {
         try {
             if (runningApiCallSemaphore.tryAcquire(maxWaitMs, TimeUnit.MILLISECONDS)) {
                 return;
@@ -444,7 +444,7 @@ public class VmApiProxyEnvironment implements ApiProxy.Environment {
     /**
      * Notifies the environment that an API call completed.
      */
-    void apiCallCompleted() {
+    public void apiCallCompleted() {
         runningApiCallSemaphore.release();
     }
 }

@@ -50,7 +50,7 @@ import java.util.logging.Logger;
  * <p/>
  * <p>Instances should be registered using ApiProxy.setDelegate(ApiProxy.Delegate).
  */
-public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironment> {
+public class VmApiProxyDelegate implements ApiProxy.Delegate<LazyApiProxyEnvironment> {
 
     private static final Logger logger = Logger.getLogger(VmApiProxyDelegate.class.getName());
 
@@ -96,7 +96,7 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
 
     @Override
     public byte[] makeSyncCall(
-            VmApiProxyEnvironment environment,
+            LazyApiProxyEnvironment environment,
             String packageName,
             String methodName,
             byte[] requestData)
@@ -106,7 +106,7 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
     }
 
     private byte[] makeSyncCallWithTimeout(
-            VmApiProxyEnvironment environment,
+            LazyApiProxyEnvironment environment,
             String packageName,
             String methodName,
             byte[] requestData,
@@ -115,7 +115,7 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
         return makeApiCall(environment, packageName, methodName, requestData, timeoutMs, false);
     }
 
-    private byte[] makeApiCall(VmApiProxyEnvironment environment,
+    private byte[] makeApiCall(LazyApiProxyEnvironment environment,
                                String packageName,
                                String methodName,
                                byte[] requestData,
@@ -130,7 +130,7 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
     }
 
 
-    protected byte[] runSyncCall(VmApiProxyEnvironment environment, String packageName,
+    protected byte[] runSyncCall(LazyApiProxyEnvironment environment, String packageName,
                                  String methodName, byte[] requestData, int timeoutMs) {
         HttpPost request = createRequest(environment, packageName, methodName, requestData, timeoutMs);
         try {
@@ -175,7 +175,7 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
      * @param timeoutMs   The timeout for this request
      * @return an HttpPost object to send to the API.
      */
-    static HttpPost createRequest(VmApiProxyEnvironment environment, String packageName,
+    static HttpPost createRequest(LazyApiProxyEnvironment environment, String packageName,
                                   String methodName, byte[] requestData, int timeoutMs) {
         RemoteApiPb.Request remoteRequest = new RemoteApiPb.Request();
         remoteRequest.setServiceName(packageName);
@@ -303,14 +303,14 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
 
     private class MakeSyncCall implements Callable<byte[]> {
         private final VmApiProxyDelegate delegate;
-        private final VmApiProxyEnvironment environment;
+        private final LazyApiProxyEnvironment environment;
         private final String packageName;
         private final String methodName;
         private final byte[] requestData;
         private final int timeoutMs;
 
         public MakeSyncCall(VmApiProxyDelegate delegate,
-                            VmApiProxyEnvironment environment,
+                            LazyApiProxyEnvironment environment,
                             String packageName,
                             String methodName,
                             byte[] requestData,
@@ -336,7 +336,7 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
 
     @Override
     public Future<byte[]> makeAsyncCall(
-            VmApiProxyEnvironment environment,
+            LazyApiProxyEnvironment environment,
             String packageName,
             String methodName,
             byte[] request,
@@ -351,21 +351,21 @@ public class VmApiProxyDelegate implements ApiProxy.Delegate<VmApiProxyEnvironme
     }
 
     @Override
-    public void log(VmApiProxyEnvironment environment, LogRecord record) {
+    public void log(LazyApiProxyEnvironment environment, LogRecord record) {
         if (environment != null) {
             environment.addLogRecord(record);
         }
     }
 
     @Override
-    public void flushLogs(VmApiProxyEnvironment environment) {
+    public void flushLogs(LazyApiProxyEnvironment environment) {
         if (environment != null) {
             environment.flushLogs();
         }
     }
 
     @Override
-    public List<Thread> getRequestThreads(VmApiProxyEnvironment environment) {
+    public List<Thread> getRequestThreads(LazyApiProxyEnvironment environment) {
         Object threadFactory =
                 environment.getAttributes().get(VmApiProxyEnvironment.REQUEST_THREAD_FACTORY_ATTR);
         if (threadFactory != null && threadFactory instanceof VmRequestThreadFactory) {
