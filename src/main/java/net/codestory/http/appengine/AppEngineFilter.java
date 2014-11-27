@@ -46,14 +46,15 @@ public class AppEngineFilter implements Filter {
             return new Payload("ok");
         }
 
-        ApiProxy.setEnvironmentForCurrentThread(VmApiProxyEnvironment.createFromHeaders(
-                System.getenv(),
-                metadataCache,
-                name -> context.request().header(name),
-                VmRuntimeUtils.getApiServerAddress(),
-                wallclockTimer,
-                VmRuntimeUtils.ONE_DAY_IN_MILLIS
-        ));
+        ApiProxy.setEnvironmentForCurrentThread(
+                new LazyApiProxyEnvironment(() -> VmApiProxyEnvironment.createFromHeaders(
+                        System.getenv(),
+                        metadataCache,
+                        name -> context.request().header(name),
+                        VmRuntimeUtils.getApiServerAddress(),
+                        wallclockTimer,
+                        VmRuntimeUtils.ONE_DAY_IN_MILLIS
+                )));
 
         return nextFilter.get();
     }
