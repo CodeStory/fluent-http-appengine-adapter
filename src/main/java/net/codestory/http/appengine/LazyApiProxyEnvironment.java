@@ -20,12 +20,12 @@ import com.google.apphosting.api.ApiProxy;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class LazyApiProxyEnvironment implements ApiProxy.Environment {
+class LazyApiProxyEnvironment implements ApiProxy.Environment {
     private final Supplier<ApiProxy.Environment> supplier;
 
     private ApiProxy.Environment delegate;
 
-    public LazyApiProxyEnvironment(Supplier<ApiProxy.Environment> supplier) {
+    LazyApiProxyEnvironment(Supplier<ApiProxy.Environment> supplier) {
         this.supplier = supplier;
     }
 
@@ -72,6 +72,7 @@ public class LazyApiProxyEnvironment implements ApiProxy.Environment {
     }
 
     @Override
+    @Deprecated
     public String getRequestNamespace() {
         return delegate().getRequestNamespace();
     }
