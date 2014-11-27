@@ -37,11 +37,15 @@ public class AppEngineFilter implements Filter {
 
     @Override
     public boolean matches(String uri, Context context) {
-        return !uri.startsWith("/_ah/") && !uri.startsWith("/webjars/");
+        return !uri.startsWith("/webjars/");
     }
 
     @Override
     public Payload apply(String uri, Context context, PayloadSupplier nextFilter) throws IOException {
+        if (uri.equals("/_ah/start") || uri.equals("/_ah/stop") || uri.equals("/_ah/health")) {
+            return new Payload("ok");
+        }
+
         ApiProxy.setEnvironmentForCurrentThread(VmApiProxyEnvironment.createFromHeaders(
                 System.getenv(),
                 metadataCache,
